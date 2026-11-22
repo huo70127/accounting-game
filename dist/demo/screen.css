@@ -1,0 +1,251 @@
+/* The visible viewport is the game stage, including browser bars and safe areas. */
+html:has(body.one-screen) { height: 100%; overflow: hidden; }
+body.one-screen { position: fixed; top: var(--viewport-top); left: 0; width: 100%; height: var(--viewport-height); min-height: 0; margin: 0; padding: env(safe-area-inset-top,0px) max(16px,env(safe-area-inset-right,0px)) env(safe-area-inset-bottom,0px) max(16px,env(safe-area-inset-left,0px)); display: flex; flex-direction: column; overflow: hidden; overscroll-behavior: none; background: #fff8ed; }
+.one-screen [hidden] { display: none !important; }
+.one-screen .site-header { flex: 0 0 60px; width: min(1164px,100%); min-height: 0; margin: 0 auto; padding: 6px 0; border: 0; background: transparent; box-shadow: none; }
+.one-screen .brand { font-size: 22px; }
+.one-screen .brand small { font-size: 10px; }
+.one-screen .header-tools { gap: 8px; }
+.one-screen #openmenu { border: 1px solid #dfd2b9; background: #fffef8; border-radius: 13px; font-size: 20px; color: #54617a; }
+.one-screen #openbook { display: flex; align-items: center; gap: 6px; padding: 8px 12px; font-size: 13px; }
+.one-screen #openbook .pending-badge { position: static; font-size: 10px; line-height: 18px; }
+.one-screen .app-shell { display: flex; flex: 1; flex-direction: column; gap: 9px; width: min(1164px,100%); min-height: 0; margin: 0 auto; padding: 0; }
+.game-hud { display: flex; align-items: center; justify-content: space-between; flex: 0 0 46px; gap: 12px; min-width: 0; }
+.game-hud h1 { margin: 0; white-space: nowrap; font-size: 14px; color: #8b7858; font-weight: 600; }
+.game-hud h1>span { display: block; margin-top: 2px; font-size: 12px; color: #a1937a; }
+.one-screen .snapshot { display: flex; gap: 8px; margin: 0; }
+.one-screen .stat,.one-screen .stat:first-child { display: flex; align-items: center; gap: 10px; min-width: 0; min-height: 38px; margin: 0; padding: 5px 10px; border: 1px solid #eddfbf; border-radius: 11px; background: #fffdf6; box-shadow: 0 2px 0 #eddfbf; }
+.one-screen .stat-label { display: flex; gap: 4px; font-size: 10px; white-space: nowrap; color: #8b7858; }
+.one-screen .stat strong,.one-screen .stat:first-child strong { margin: 0; font-size: 19px; line-height: 1; color: #324e77; }
+.one-screen .stat strong small { font-size: 11px; }
+.one-screen .chapter-progress { flex: 0 0 6px; display: flex; gap: 5px; min-height: 0; padding: 0; margin: 0 0 5px; border: 0; background: transparent; box-shadow: none; }
+.one-screen .progress-step { flex: 1; height: 5px; overflow: hidden; color: transparent; font-size: 0; border-radius: 5px; background: #eadfc9; }
+.one-screen .progress-step b,.one-screen .progress-connector { display: none; }
+.one-screen .progress-step.done { background: #8fb6ec; }
+.one-screen .progress-step.current { background: #f7c539; box-shadow: none; }
+.one-screen .game-layout { flex: 1; display: grid; grid-template-columns: minmax(0,.85fr) minmax(0,1.15fr); gap: 24px; min-height: 0; align-items: stretch; }
+.one-screen .dashboard { display: block; position: static; min-height: 0; height: 100%; }
+.one-screen .guide-card { display: flex; position: relative; height: 100%; min-height: 0; flex-direction: column; align-items: center; justify-content: center; padding: 24px; overflow: hidden; border: 2px solid #ead8ae; border-radius: 26px; background: radial-gradient(ellipse at 45% 35%,#fff3b0 0%,#ffe6a7 45%,#f9d8a6 100%); box-shadow: inset 0 0 0 5px #fff4d05c,0 5px 0 #e8c996; }
+.stage-scenery { width: 100%; max-width: 520px; opacity: .83; }
+.stage-scenery>svg { display: block; width: 100%; height: auto; max-height: 220px; }
+.one-screen .guide-card>.mascot { flex: 0 1 auto; width: 100%; max-width: 420px; max-height: 48%; min-height: 0; margin: -25px 0 0; mix-blend-mode: multiply; z-index: 1; }
+.one-screen .duo-labels { display: flex; justify-content: space-around; width: 90%; max-width: 360px; margin: 4px auto 0; color: #946529; font-size: 12px; }
+.one-screen .guide-speech { display: none; }
+.one-screen .play-area { display: flex; flex-direction: column; gap: 10px; width: 100%; height: 100%; min-height: 0; }
+.one-screen .day-timeline { position: relative; flex: 0 0 42px; display: flex; align-items: center; gap: 10px; min-height: 0; padding: 0 5px; margin: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+.one-screen .time-now { gap: 6px; flex: 0 0 auto; }
+.one-screen .story-clock { width: 28px; height: 28px; }
+.one-screen .time-now>div { flex-direction: row; align-items: baseline; gap: 5px; }
+.one-screen .time-now span { font-size: 10px; }
+.one-screen .time-now strong { font-size: 16px; }
+.one-screen .time-now>small,.one-screen .time-empty { display: none; }
+.one-screen .day-track { display: none; }
+.timeline-peek { display: flex; align-items: center; gap: 5px; min-height: 36px; min-width: 0; padding: 4px 6px; margin-left: auto; background: transparent; border: 0; color: #66768f; font-size: 11px; text-align: right; }
+.timeline-peek span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.timeline-peek i { flex: none; width: 6px; height: 6px; border-radius: 50%; background: #efb926; }
+.one-screen .play-card { display: flex; flex-direction: column; flex: 1; min-height: 0; margin: 0; overflow: hidden; border: 2px solid #e3d9c6; border-radius: 24px; background: #fffefb; box-shadow: 0 5px 0 #e9ddc5; }
+.one-screen .card-content.screen-card { flex: 1; display: flex; flex-direction: column; gap: 14px; min-height: 0; padding: 25px 28px; overflow: hidden; border: 0; border-radius: 0; box-shadow: none; background: transparent; }
+.screen-heading { flex: 0 0 auto; }
+.one-screen .card-topline { display: flex; margin: 0 0 12px; gap: 8px; align-items: center; }
+.one-screen .lesson-label { font-size: 11px; }
+.one-screen .concept-tag { padding: 4px 7px; font-size: 10px; }
+.one-screen .card-title { margin: 0; font-size: clamp(22px,2.4vw,30px); line-height: 1.45; }
+.one-screen .question-context { margin: 8px 0 0; font-size: 15px; line-height: 1.7; color: #677891; }
+.screen-pages,.reading-body { flex: 1; min-height: 0; position: relative; overflow: hidden; }
+.screen-page { display: flex; flex-direction: column; gap: 12px; min-width: 0; padding: 2px 2px 5px; }
+.screen-page:focus { outline: none; }
+.one-screen .screen-page p { margin: 0; line-height: 1.8; font-size: 16px; }
+.one-screen .screen-page .card-lead { color: #596b84; }
+.one-screen .story-dialogue { flex: none; margin: 0; padding: 16px 18px; font-size: 16px; line-height: 1.85; border-radius: 16px 16px 16px 5px; }
+.one-screen .story-note { margin: 0; padding: 14px; font-size: 15px; line-height: 1.8; }
+.one-screen .term-card { margin: 0; padding: 14px 16px; }
+.one-screen .term-card h3 { margin: 0 0 7px; font-size: 19px; }
+.one-screen .formula-line { margin: 8px 0 0 !important; padding: 10px !important; font-size: 16px; }
+.one-screen .word-new-badge { margin-bottom: 12px; }
+.one-screen .word-learned { margin: 0; font-size: 12px; }
+.one-screen .answer-list { display: grid; gap: 10px; margin: 0; }
+.one-screen .answer-option { min-height: 52px; padding: 10px 14px; font-size: 16px; }
+.one-screen .feedback { margin: 0; padding: 13px; border-radius: 14px; }
+.one-screen .feedback p { font-size: 15px; }
+.one-screen .feedback-badge { flex: 0 0 25px; width: 25px; height: 25px; font-size: 16px; }
+.one-screen .budget-card { margin: 0; padding: 14px 16px; border-radius: 15px; }
+.one-screen .budget-card h3 { margin: 0 0 8px; font-size: 16px; }
+.one-screen .budget-row { padding: 6px 0; font-size: 14px; }
+.one-screen .budget-total,.one-screen .budget-gap { padding: 8px 0; font-size: 14px; }
+.one-screen .budget-total strong,.one-screen .budget-gap strong { font-size: 18px; }
+.one-screen .review-grid { margin: 0; gap: 8px; }
+.one-screen .review-tile { padding: 12px 8px; min-width: 0; }
+.one-screen .review-tile strong { font-size: 23px; }
+.one-screen .result-actions { display: flex; flex-wrap: wrap; gap: 9px; margin: 0; }
+.one-screen .result-actions>* { min-height: 44px; }
+.one-screen .screen-page .radar { align-self: center; max-height: 240px; width: 240px; flex: none; }
+.one-screen .challenge-invite { margin: 0; padding: 13px; }
+.one-screen .challenge-invite h3 { margin: 0 0 8px; }
+.one-screen .challenge-invite p { font-size: 14px; }
+.one-screen .pending-resume { margin: 0; padding: 14px; }
+.one-screen .liquidation-list { margin: 0; }
+.one-screen .liquidation-step { padding: 10px; }
+.stage-detail-link { align-self: flex-start; min-height: 44px; padding: 8px 12px; border: 1px solid #cbd9eb; border-radius: 10px; background: #f0f6ff; color: #456693; font-size: 13px; }
+.one-screen .scene-action-dock { position: static; flex: 0 0 76px; min-height: 0; padding: 9px 0 12px; margin: 0; border: 0; background: transparent; box-shadow: none; backdrop-filter: none; }
+.one-screen .scene-action-dock .actionbar,.reading-actions { display: flex; align-items: center; justify-content: space-between; gap: 15px; height: 100%; width: 100%; padding: 0; margin: 0; border: 0; background: transparent; box-shadow: none; }
+.screen-nav { display: flex; align-items: center; gap: 8px; }
+.screen-back { height: 46px; width: 46px; flex: none; padding: 0; border: 1px solid #ded3bf; border-radius: 13px; font-size: 28px; color: #667a96; background: #fffefb; box-shadow: 0 3px 0 #e4d9c6; }
+.screen-back:disabled { opacity: .3; box-shadow: none; }
+.screen-page-number { min-width: 40px; color: #8e8067; font-size: 12px; font-variant-numeric: tabular-nums; }
+.one-screen .scene-action-dock .primary-button { width: min(340px,65%); height: 50px; min-height: 50px; padding: 7px 13px; font-size: 15px; }
+.one-screen #toast { position: fixed; bottom: max(88px,calc(env(safe-area-inset-bottom,0px) + 88px)); max-width: calc(100% - 32px); }
+.one-screen dialog#menu[open] { width: min(460px,calc(var(--viewport-width) - 24px)); padding: 20px; }
+.menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.menu-grid>button { min-height: 44px; }
+.one-screen #menu .save-status { margin: 18px 0 0; font-size: 11px; }
+.one-screen dialog#reading[open] { display: flex; flex-direction: column; gap: 14px; padding: 20px; height: min(700px,calc(var(--usable-height) - 16px)); width: min(620px,calc(var(--viewport-width) - 16px)); overflow: hidden; border-radius: 22px; }
+.reading-dialog>.dialog-heading { flex: 0 0 46px; margin: 0; }
+.reading-dialog h2 { font-size: 20px; }
+.reading-actions { flex: 0 0 52px; }
+.reading-actions .primary-button { min-width: 150px; min-height: 46px; }
+.reading-body .day-track { display: flex; flex-direction: column; gap: 8px; margin: 0; padding-left: 20px; }
+.reading-body .day-track li { display: flex; flex: none; flex-direction: row; gap: 12px; padding: 10px; color: #51657f; font-size: 14px; text-align: left; }
+.reading-body .day-track li::before,.reading-body .day-track li i { display: none; }
+.reading-body .day-track .current { background: #fff3c1; border-radius: 10px; }
+/* The three statements share one full-screen shell. Rows turn as pages. */
+.one-screen dialog#book[open] { width: min(940px,calc(var(--viewport-width) - 16px)); height: calc(var(--usable-height) - 16px); max-height: calc(var(--usable-height) - 16px); padding: 10px 16px 0; border-radius: 20px; overflow: hidden; }
+.one-screen #book>.dialog-heading { height: 40px; min-height: 40px; flex: 0 0 40px; margin: 0; }
+.one-screen #book .dialog-heading .eyebrow { display: none; }
+.one-screen #book .dialog-heading h2 { margin: 0; font-size: 19px; }
+.one-screen #book>#book-caption { flex: 0 0 22px; height: 22px; min-height: 22px; margin: 3px 0 0; font-size: 11px; }
+.one-screen #book>#book-tabs { flex: 0 0 57px; min-height: 57px; height: 57px; margin: 4px 0 8px; }
+.one-screen #book>#book-tabs button { min-height: 52px; padding: 4px; font-size: 12px; }
+.one-screen #book>#book-body { flex: 1; min-height: 0; padding: 0 2px; overflow: hidden; scrollbar-gutter: auto; }
+.one-screen .animated-statement,.one-screen .animated-statement.balance-statement { padding: 10px; margin: 0; border-radius: 12px; }
+.one-screen .animated-statement>h3 { margin: 0 0 5px; font-size: 17px; }
+.one-screen .animated-statement>p { display: none; }
+.one-screen .statement-meta { margin: 5px 0 9px; font-size: 10px; }
+.one-screen .balance-column>h4 { min-height: 33px; margin: 0; padding: 4px; font-size: 13px; line-height: 1.5; }
+.one-screen .balance-details { flex: 1; }
+.one-screen .balance-details>h5 { margin: 4px 3px 0; font-size: 11px; line-height: 1.8; }
+.one-screen .animated-statement .balance-sheet .book-row { padding: 7px 3px; font-size: 12px; }
+.one-screen .animated-statement .balance-column>.book-row.total { min-height: 44px; margin-top: 6px; }
+.one-screen .animated-statement .financial-table .book-row { min-height: 40px; padding: 8px; font-size: 13px; }
+.one-screen .statement-columns { padding: 7px 8px; font-size: 12px; }
+.one-screen .animated-statement .financial-table .total { margin-top: 4px; }
+.one-screen .cashflow-group { margin-bottom: 5px; }
+.one-screen .cashflow-group>h4 { padding: 7px; font-size: 12px; }
+.one-screen .cash-reconciliation { margin-top: 8px; }
+.one-screen .book-equation { margin: 6px 0 0; padding: 7px; font-size: 12px; }
+.sheet-pager { display: flex; flex: 0 0 44px; min-height: 44px; gap: 7px; align-items: center; justify-content: center; }
+.sheet-turn,.sheet-notes { min-height: 40px; padding: 4px 8px; border: 0; border-radius: 8px; color: #48658a; background: #edf4fd; font-size: 12px; }
+.sheet-turn:disabled { opacity: .35; }
+.sheet-page-label { min-width: 38px; text-align: center; font-size: 11px; color: #7c8795; }
+.sheet-notes { margin-left: auto; background: transparent; }
+.one-screen #book>#book-footer { display: grid; flex: 0 0 108px; height: 108px; min-height: 108px; grid-template-rows: 42px 50px; padding: 4px 0 9px; gap: 3px; }
+.one-screen #book .book-secondary-actions { display: none; }
+.one-screen #book-footer #book-alert { overflow: hidden; }
+.one-screen #book-footer .entry-alert,.one-screen #book-footer .book-success,.one-screen #book-footer .book-nudge { padding: 7px 9px; font-size: 12px; line-height: 1.5; }
+.one-screen #book .field-error { font-size: 11px; }
+.one-screen .book-math-guide { font-size: 12px; padding: 7px; }
+.guide-expand { min-height: 36px; display: block; margin: 5px 0 0; padding: 4px 6px; color: #8b492f; background: #fff3da; border: 1px solid #e2c39e; border-radius: 8px; font-size: 11px; }
+.compact-guide>.guide-copy { display: none; }
+.compact-guide>.guide-expand { margin: 0; }
+.one-screen .screen-page { animation: screen-beat .18s ease-out; }
+@keyframes screen-beat { from { opacity: .5; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+.no-motion .screen-page { animation: none; }
+@media(max-width:700px) {
+ .one-screen .site-header { flex-basis: 50px; }
+ .one-screen .brand { gap: 6px; font-size: 20px; }
+ .one-screen .brand-mark { width: 30px; height: 30px; font-size: 27px; }
+ .one-screen .brand small { display: none; }
+ .one-screen #openbook { width: auto; font-size: 12px; min-width: 44px; }
+ .one-screen .app-shell { gap: 6px; }
+ .game-hud { flex-basis: 38px; gap: 4px; }
+ .game-hud h1 { font-size: 11px; }
+ .game-hud h1>span { display: none; }
+ .one-screen .snapshot { gap: 5px; }
+ .one-screen .stat,.one-screen .stat:first-child { gap: 5px; min-height: 32px; padding: 5px 7px; border-radius: 9px; }
+ .one-screen .stat-label { font-size: 0; }
+ .one-screen .stat-label svg { width: 15px; height: 15px; }
+ .one-screen .stat strong,.one-screen .stat:first-child strong { font-size: 17px; }
+ .one-screen .chapter-progress { margin-bottom: 3px; flex-basis: 4px; }
+ .one-screen .progress-step { height: 4px; }
+ .one-screen .game-layout { display: flex; flex-direction: column; gap: 8px; }
+ .one-screen .dashboard { flex: 0 0 clamp(98px,calc(var(--viewport-height)*.205),180px); height: auto; }
+ .one-screen.is-question .dashboard { flex-basis: clamp(70px,calc(var(--viewport-height)*.13),112px); }
+ .one-screen .guide-card { flex-direction: row; border-radius: 20px; padding: 4px 10px; }
+ .stage-scenery { position: absolute; width: 65%; left: 0; bottom: 3px; opacity: .65; }
+ .stage-scenery>svg { max-height: 140px; }
+ .one-screen .guide-card>.mascot { position: absolute; right: 0; bottom: 3px; width: 61%; height: 100%; max-height: 100%; margin: 0; }
+ .one-screen .duo-labels { position: absolute; top: 7px; left: 9px; width: auto; gap: 7px; margin: 0; font-size: 9px; color: #8b6635; }
+ .one-screen .play-area { flex: 1; gap: 5px; }
+ .one-screen .day-timeline { flex-basis: 30px; gap: 3px; padding: 0 2px; }
+ .one-screen .time-now span { font-size: 9px; }
+ .one-screen .time-now strong { font-size: 14px; }
+ .one-screen .story-clock { width: 23px; height: 23px; }
+ .timeline-peek { font-size: 10px; min-height: 30px; padding-right: 0; }
+ .one-screen .card-content.screen-card { padding: 15px 17px; gap: 10px; }
+ .one-screen .play-card { border-radius: 19px; }
+ .one-screen .card-title { font-size: 22px; line-height: 1.4; }
+ .one-screen .card-topline { margin-bottom: 7px; }
+ .one-screen .lesson-label { font-size: 10px; }
+ .one-screen .concept-tag { font-size: 9px; padding: 2px 5px; }
+ .one-screen .screen-page { gap: 10px; }
+ .one-screen .screen-page p,.one-screen .story-dialogue { font-size: 15px; line-height: 1.8; }
+ .one-screen .story-dialogue { padding: 13px; }
+ .one-screen .screen-page .detail-note { font-size: 12px; }
+ .one-screen .scene-action-dock { flex-basis: 67px; padding: 7px 0 10px; }
+ .one-screen .scene-action-dock .primary-button { width: calc(100% - 99px); min-height: 48px; height: 48px; font-size: 14px; }
+ .screen-nav { gap: 6px; }
+ .screen-back { width: 40px; height: 44px; }
+ .screen-page-number { min-width: 35px; font-size: 11px; }
+ .one-screen .review-tile strong { font-size: 20px; }
+ .one-screen .review-tile small { font-size: 10px; }
+ .one-screen dialog#book[open] { padding: 7px 9px 0; }
+ .one-screen .animated-statement.balance-statement { padding: 7px; }
+ .one-screen .balance-column>h4 { font-size: 12px; }
+ .one-screen .animated-statement .balance-sheet .book-row { font-size: 11px; }
+ .one-screen .animated-statement .balance-sheet .book-input-cell input { min-width: 42px; width: 4ch; }
+ .one-screen .book-input-cell .input-control { min-height: 42px; }
+ .one-screen .animated-statement .financial-table .book-row { font-size: 12px; }
+ .one-screen dialog#reading[open] { padding: 14px; }
+}
+@media(max-height:650px) and (max-width:700px) {
+ .one-screen .dashboard { flex-basis: 94px; }
+ .one-screen.is-question .dashboard { display: none; }
+ .one-screen .site-header { flex-basis: 46px; }
+ .one-screen .game-hud { flex-basis: 32px; }
+ .one-screen .card-content.screen-card { padding: 12px 15px; }
+ .one-screen .card-title { font-size: 20px; }
+ .one-screen .concept-tag { display: none; }
+ .one-screen .card-topline { margin-bottom: 5px; }
+ .one-screen .scene-action-dock { flex-basis: 62px; padding-bottom: 6px; }
+}
+@media(orientation:landscape) and (max-height:600px) {
+ .one-screen .site-header { flex-basis: 44px; }
+ .one-screen .game-hud { flex-basis: 30px; }
+ .one-screen .game-layout { display: grid; grid-template-columns: minmax(0,.7fr) minmax(0,1.3fr); gap: 14px; }
+ .one-screen .dashboard { height: 100%; }
+ .one-screen .guide-card { flex-direction: column; padding: 8px; }
+ .one-screen .stage-scenery { position: static; width: 100%; max-height: 40%; }
+ .one-screen .stage-scenery>svg { max-height: 100px; }
+ .one-screen .guide-card>.mascot { position: static; height: auto; width: 100%; max-height: 60%; margin: -10px 0 0; }
+ .one-screen .duo-labels { display: none; }
+ .one-screen .scene-action-dock { flex-basis: 58px; padding: 4px 0 7px; }
+ .one-screen .card-content.screen-card { padding: 12px 16px; gap: 6px; }
+ .one-screen .card-title { font-size: 20px; }
+ .one-screen .card-topline { display: none; }
+ .one-screen .day-timeline { flex-basis: 28px; }
+}
+.one-screen.keyboard-open .dashboard { display: none; }
+.one-screen.keyboard-open #book>.dialog-heading,.one-screen.viewport-short #book>.dialog-heading { flex-basis: 36px; min-height: 36px; height: 36px; }
+.one-screen.keyboard-open #book>#book-caption,.one-screen.viewport-short #book>#book-caption { display: none; }
+.one-screen.keyboard-open #book>#book-tabs,.one-screen.viewport-short #book>#book-tabs { flex-basis: 44px; min-height: 44px; height: 44px; margin: 0 0 4px; }
+.one-screen.keyboard-open #book>#book-tabs button,.one-screen.viewport-short #book>#book-tabs button { min-height: 42px; }
+.one-screen.keyboard-open #book .animated-statement>h3,.one-screen.viewport-short #book .animated-statement>h3 { display: none; }
+.one-screen.keyboard-open #book .statement-meta,.one-screen.viewport-short #book .statement-meta { margin: 0 0 4px; font-size: 9px; }
+.one-screen.keyboard-open #book>#book-footer,.one-screen.viewport-short #book>#book-footer { flex-basis: 82px; min-height: 82px; height: 82px; grid-template-rows: 28px 44px; padding: 2px 0 6px; }
+.one-screen.keyboard-open #book-footer .primary-button,.one-screen.viewport-short #book-footer .primary-button { min-height: 44px; height: 44px; }
+.one-screen.keyboard-open .sheet-pager,.one-screen.viewport-short .sheet-pager { flex-basis: 36px; min-height: 36px; }
+.one-screen.keyboard-open .sheet-turn,.one-screen.keyboard-open .sheet-notes,.one-screen.viewport-short .sheet-turn,.one-screen.viewport-short .sheet-notes { min-height: 34px; }
+.one-screen.keyboard-open #book .book-equation,.one-screen.viewport-short #book .book-equation { display: none; }
+.one-screen.keyboard-open #book .statement-meta { display: none; }
+.one-screen.keyboard-open #book .balance-column>h4 { min-height: 24px; padding: 1px 3px; font-size: 11px; }
+.one-screen.keyboard-open #book .animated-statement { padding: 4px; }
+@media(prefers-reduced-motion:reduce) { .one-screen .screen-page { animation: none; } }

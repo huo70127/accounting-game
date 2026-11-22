@@ -1,0 +1,31 @@
+{
+  "format": 1,
+  "input": 784,
+  "hidden": 96,
+  "output": 10,
+  "side": 28,
+  "arrays": [
+    [
+      784,
+      96
+    ],
+    [
+      96
+    ],
+    [
+      96,
+      10
+    ],
+    [
+      10
+    ]
+  ],
+  "byteLength": 305320,
+  "normalization": "bbox-20-center-of-mass-28",
+  "heldOutMNISTAccuracy": 0.9756,
+  "trainingSamples": 60000,
+  "testSamples": 10000,
+  "seed": 811,
+  "license": "CC-BY-SA-3.0",
+  "weights": "digits.f32"
+}

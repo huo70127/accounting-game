@@ -1,0 +1,19 @@
+import {staffing} from './summer-rules.js';
+import {businessDay,weekEnd,weekday} from './calendar.js';
+import {balances,report,money} from './accounting.js';
+import {clockTime} from './timeline.js';
+import {dateLabel,possibleCups} from './procurement.js';
+import {dayResult} from './daily.js';
+
+export const dayPart=minute=>minute<720?'上午':minute<840?'中午':minute<1020?'下午':'傍晚';
+export function renderTrading(s,{top,foot}){
+ if(s.stage!=='dailyTrading')return null;const b=balances(s),r=report(s),today=dayResult(s),paused=s.course.daily.shift.paused,purchase=s.tx.slice(s.course.daily.shift.beforeTx).find(t=>t.kind==='stock-purchase'),rawLoss=s.tx.slice(s.course.daily.shift.beforeTx).find(t=>t.rawHandling),last=s.tx.filter(t=>t.kind==='sale'&&t.storyAt?.day===s.day).at(-1),openingNote=last?`${clockTime(last.storyAt.minute)} · 卖出 ${last.quantity} 杯${last.bundles?`及 ${last.bundles} 份点心`:''}，收到 ${money(last.delta.cash||0)} 元`:purchase?`备货 ${money(-(purchase.delta.cash||0))} 元${rawLoss?`，原料报损 ${money(rawLoss.loss)} 元`:''}。接单后现打。`:'招牌摆好了，看看今天的巷口热不热闹。',footer=foot(paused?'继续营业':'暂停一下','pause-day','看着太阳走，今天的收款一笔一笔来。');
+ return `<div class="card-content trading-card">${top(dateLabel(s.day,s),paused?'歇一会儿':'小摊营业中')}<h2 class="card-title" id="card-title" tabindex="-1">第 ${businessDay(s)} 天 · ${paused?'营业暂停了':'今天也开摊啦'}</h2><div class="trading-stage" data-trading-stage style="--day-progress:${(s.course.minute-540)/540}"><div class="shift-time"><span data-day-part>${dayPart(s.course.minute)}</span><strong data-trading-time>${clockTime(s.course.minute)}</strong><small data-trading-state>${paused?'点继续，再接着卖茶':staffing(s).helper?'帮手代班，你安心休息':`现打 ${s.course.upgrade?2:4} 分钟／杯 · 客人愿等 8 分钟`}</small></div><div class="daylight-track" aria-label="早上到晚上的时间流转"><span>早上</span><div><i></i><b aria-hidden="true">☀</b></div><span>晚上</span></div><div class="live-tea"><svg viewBox="0 0 70 80" aria-hidden="true"><path d="M14 20h42l-7 53H21Z" fill="#ffdd78" stroke="#c8912d" stroke-width="3"/><path d="m43 4-9 38M10 20h50" stroke="#6c937a" stroke-width="4"/><circle cx="35" cy="47" r="11" fill="#fff2a2" stroke="#e0b943" stroke-width="2"/></svg><div><small>今天已卖</small><strong><span data-trading-sold>${today.quantity}</span> 杯</strong><span class="live-stock" data-trading-stock>材料还可做 ${possibleCups(s)} 杯</span></div><div class="cash-flight" aria-hidden="true"><i>¥</i><i>¥</i><i>¥</i></div></div><div class="trading-balances"><div><small>钱盒 · 现金</small><strong>¥ <span data-trading-cash>${money(b.cash)}</span></strong></div><div><small>累计净利润</small><strong>¥ <span data-trading-profit>${money(r.profit)}</span></strong></div></div><p class="live-sale" data-live-sale role="status">${openingNote}</p></div></div>${footer}`;
+}
+export function paintTrading(s,sold=false){
+ const host=document.querySelector('[data-trading-stage]');if(!host||s.stage!=='dailyTrading')return;const b=balances(s),today=dayResult(s),set=(selector,value)=>{const el=document.querySelector(selector);if(el)el.textContent=value;};
+ host.style.setProperty('--day-progress',String(Math.max(0,Math.min(1,(s.course.minute-540)/540))));
+ set('[data-trading-time]',clockTime(s.course.minute));set('[data-day-part]',dayPart(s.course.minute));set('[data-trading-sold]',today.quantity);set('[data-trading-stock]',`材料还可做 ${possibleCups(s)} 杯`);set('[data-trading-cash]',money(b.cash));set('[data-trading-profit]',money(b.profit));set('[data-cash-amount]',money(b.cash));set('[data-day-profit]',money(today.profitChange));set('[data-stock-cups]',possibleCups(s));
+ for(const button of document.querySelectorAll('[data-action="pause-day"],[data-action="skip-day"]'))button.dataset.revision=String(s.revision);
+ if(sold){const sale=s.tx.filter(t=>t.kind==='sale'&&t.storyAt?.day===s.day).at(-1);set('[data-live-sale]',`${clockTime(sale.storyAt.minute)} · 卖出 ${sale.quantity} 杯，收到 ${money(sale.delta.cash)} 元`);host.classList.remove('sale-tick');void host.offsetWidth;host.classList.add('sale-tick');}
+}

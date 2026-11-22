@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+ <meta charset="utf-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+ <meta name="theme-color" content="#fff8ed">
+ <meta name="description" content="柠檬摊的独立手写数字试验：用手指或触控笔写金额，撤销、重写、修改，再填写下一格。">
+ <title>写两笔 · 柠檬摊手写试验</title>
+ <link rel="stylesheet" href="handwriting/style.css">
+</head>
+<body class="handwriting-lab">
+ <header class="lab-header"><a href="./" class="back-link">‹ 回到柠檬摊</a><span class="lab-badge">手写试验</span><button type="button" id="about" class="round-button" aria-label="查看手写试验说明">?</button></header>
+ <main class="lab-shell">
+  <section class="intro"><div><p class="eyebrow">圆滚滚拿来一张小纸条</p><h1>今天，用手写两笔。</h1><p>点一下金额格，再在下面写。写错了也能改。</p></div><div id="companions" aria-hidden="true"></div></section>
+  <section class="amounts" aria-label="两笔金额">
+   <button type="button" class="amount-card selected" data-field="0" aria-pressed="true"><span class="field-top"><span>① 自己的零花钱</span><small data-field-status="0">正在写</small></span><span class="amount-value"><small>¥</small><output id="amount-0">—</output></span></button>
+   <button type="button" class="amount-card" data-field="1" aria-pressed="false"><span class="field-top"><span>② 借来的钱</span><small data-field-status="1">待写</small></span><span class="amount-value"><small>¥</small><output id="amount-1">—</output></span></button>
+  </section>
+  <section class="writing-card" aria-label="数字手写板">
+   <header class="pad-heading"><strong id="active-label">正在写 · 自己的零花钱</strong><span>手指 / 触控笔都可以</span></header>
+   <div class="canvas-wrap" id="canvas-wrap"><canvas id="ink" aria-label="在这里手写金额，支持数字、小数点和负号"></canvas><div class="pad-placeholder" id="pad-placeholder"><span>在这里写数字</span><small>多个数字从左到右写，稍稍留点空隙</small></div><span class="paper-corner" aria-hidden="true"></span></div>
+   <div class="ink-tools" aria-label="修改笔迹"><button type="button" id="undo" disabled>↶ 撤销一笔</button><button type="button" id="redo" disabled>↷ 重做</button><button type="button" id="delete-digit" disabled>⌫ 删末位</button><button type="button" id="clear" disabled>重写这一格</button></div>
+  </section>
+  <section class="recognition" aria-label="识别结果"><div class="recognition-top"><span id="recognition-status" role="status" aria-live="polite">准备手写识别…</span><button type="button" id="edit" class="text-button">修改金额</button></div><div id="candidates" class="candidates" aria-label="其他识别结果"></div><p id="hint" class="hint" role="status">写完会显示识别结果，确认后再填下一格。</p></section>
+  <footer class="lab-actions"><button type="button" id="previous" class="secondary-button" disabled>上一格</button><button type="button" id="next" class="primary-button">记下这笔，下一格 →</button></footer>
+  <p class="lab-footnote">试写不会改动游戏进度。<a href="handwriting/credits.txt">识别模型与说明</a></p>
+ </main>
+ <dialog id="edit-dialog" aria-labelledby="edit-title"><div class="dialog-heading"><h2 id="edit-title">把金额改一下</h2><button type="button" class="round-button" data-close="edit-dialog" aria-label="收起金额修改">×</button></div><output id="edit-value" class="edit-value" aria-live="polite">—</output><div class="digit-keys" aria-label="点击数字修改金额"><button type="button" data-key="1">1</button><button type="button" data-key="2">2</button><button type="button" data-key="3">3</button><button type="button" data-key="4">4</button><button type="button" data-key="5">5</button><button type="button" data-key="6">6</button><button type="button" data-key="7">7</button><button type="button" data-key="8">8</button><button type="button" data-key="9">9</button><button type="button" data-key="sign" aria-label="添加或移除负号">−</button><button type="button" data-key="0">0</button><button type="button" data-key=".">.</button></div><div class="edit-tools"><button type="button" id="edit-delete">⌫ 删除末位</button><button type="button" id="edit-clear">清空</button></div><p id="edit-hint" role="status">可以点数字修改，也可以关掉后重新手写。</p><button type="button" id="edit-apply" class="primary-button">就用这个金额</button></dialog>
+ <dialog id="about-dialog" aria-labelledby="about-title"><div class="dialog-heading"><h2 id="about-title">先试试，写起来顺不顺。</h2><button type="button" class="round-button" data-close="about-dialog" aria-label="关闭说明">×</button></div><p>这张纸条没有标准答案。你可以随便写两笔金额，试试连续填写、撤销、重写和修改。</p><p>写多个数字时，从左到右稍稍留点空隙。支持小数点和负号；数字暂时不要叠写或连在一起。</p><p>看错了可以点候选金额，或者用「修改金额」直接改。这里的数字按钮也不会打开系统键盘。</p><p>笔迹在当前设备上识别，不上传。关掉或刷新试验页会清空这张纸条，正式游戏的键盘输入和进度不受影响。</p><a class="secondary-button" href="./">回到现在的游戏</a></dialog>
+ <script type="module" src="handwriting/lab.js"></script>
+</body>
+</html>

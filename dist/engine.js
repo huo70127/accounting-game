@@ -1,0 +1,38 @@
+import {cents,yuan,sumMoney} from './currency.js';
+import {ensureStock,possibleCups,suggestedCart,quote,receive,consumeRecipe,takeCup,expiry,validateStock} from './materials.js';
+import {ensureWorld,afterAction,arrive,callOut} from './rhythm.js';
+import {RULES as R,EVENING_EVENT} from './events.js';
+import {createSeed,draw} from './chance.js';
+export function fresh(seed=createSeed()){const s={rngState:seed>>>0,evening:null,day:1,phase:'intro',tx:[],flags:{},sold:0,channel:null,snapshot:null,end:null};ensureWorld(s);ensureStock(s);return s;}
+export function balances(s,day=3){let b={cash:0,inventory:0,receivable:0,equipment:0,debt:0,familyDebt:0,interest:0,capital:0,profit:0};for(const t of s.tx.filter(t=>t.day<=day))for(const [k,v]of Object.entries(t.delta))b[k]+=cents(v);return Object.fromEntries(Object.entries(b).map(([k,v])=>[k,yuan(v)]));}
+export function post(s,id,label,delta,flow='经营',details={}){if(s.tx.some(t=>t.id===id))return false;s.tx.push({id,label,day:s.day,delta,flow,...details});validate(s);return true;}
+export function validate(s){const b=balances(s);if(b.cash<0||b.inventory<0)throw Error('余额不足');if([b.cash,b.inventory,b.receivable,b.equipment].reduce((n,v)=>n+cents(v),0)!==[b.debt,b.familyDebt,b.interest,b.capital,b.profit].reduce((n,v)=>n+cents(v),0))throw Error('账目不平');return true;}
+export function start(seed){return fresh(seed);}
+export function needsReview(s){return ['close1','close2','end'].includes(s.phase)&&!s.flags['review'+s.day];}
+export function act(s,a,n){ensureWorld(s);ensureStock(s);if(s.pendingLesson)return false;if(a==='review'){if(!['close1','close2','end'].includes(s.phase))return false;s.flags['review'+s.day]=true;s.pendingConcepts=null;return true;}if(a==='next'&&needsReview(s))return false;if(a==='arrive')return arrive(s);if(a==='call')return callOut(s);if(s.world.wait)return false;const b=balances(s);const p=s.phase;
+if(p==='intro'&&a==='family'){post(s,'family','向父母借启动资金 10 元 · 免息，本章不要求归还',{cash:R.familyLoan,familyDebt:R.familyLoan},'筹资');s.phase='supplies';}
+else if(p==='supplies'&&a==='supplies'){const cart=n&&typeof n==='object'?n:suggestedCart(s,4),q=quote(cart);if(!q||q.costFen<=0||q.costFen>cents(b.cash))return false;const counts=Object.fromEntries(Object.entries(cart).map(([k,v])=>[k,v+(s.stockLots||[]).filter(l=>l.material===k).reduce((n,l)=>n+l.quantity,0)]));const probe={stockLots:Object.entries(counts).map(([material,quantity])=>({material,quantity})),readyCups:0};if(possibleCups(probe)<4)return false;post(s,'opening','采购柠檬、白茶、糖与包材，共 '+q.cost+' 元；制作 4 杯',{cash:-q.cost,inventory:q.cost});receive(s,cart);consumeRecipe(s,4);s.readyCups+=4;s.phase='first';}
+else if(p==='first'&&a==='serve'){if(!takeCup(s))return false;post(s,'first','第一位客人 · 递出 1 杯，收到 5 元',{cash:5,inventory:-2,profit:3});s.phase='credit';}
+else if(p==='credit'&&['full','deposit','refuse'].includes(a)){if(a!=='refuse'){if(s.readyCups<3)return false;s.readyCups-=3;post(s,'credit',a==='full'?'递出 3 杯 · 欠条 15 元，明天收款':'递出 3 杯 · 先收 3 元，明天收 12 元',{cash:a==='deposit'?3:0,receivable:a==='deposit'?12:15,inventory:-6,profit:9});}s.flags.credit=a;s.phase=a==='refuse'?'dusk':'supplier';}
+else if(p==='dusk'&&a==='wait'){s.evening={demand:draw(s,EVENING_EVENT),served:0,spoiled:0};s.phase='evening';}
+else if(p==='evening'&&a==='eveningCup'){if(!s.evening||s.evening.served>=s.evening.demand||s.readyCups<1)return false;s.readyCups--;post(s,'evening-cup'+s.evening.served,'晚客现付 · 递出 1 杯，收到 5 元',{cash:R.price,inventory:-R.cost,profit:R.price-R.cost},'经营',{kind:'sale'});s.evening.served++;}
+else if(p==='evening'&&a==='finishEvening'){if(s.evening.served<s.evening.demand)return false;const spoiled=s.readyCups;if(spoiled>0)post(s,'spoilage1','收摊报损 · '+spoiled+' 杯现制柠檬茶未售完',{inventory:-spoiled*R.cost,profit:-spoiled*R.cost},'非现金',{kind:'spoilage'});s.readyCups=0;s.evening.spoiled=spoiled;s.phase='supplier';}
+else if(p==='supplier'&&['buy','skip'].includes(a)){if(a==='buy'){const cart=n&&typeof n==='object'?n:suggestedCart(s,5),q=quote(cart);if(!q||q.costFen<=0||q.costFen>cents(b.cash))return false;post(s,'supplier','茶料与包材补货，共 '+q.cost+' 元',{cash:-q.cost,inventory:q.cost});receive(s,cart);}s.flags.stock=a;s.phase='close1';}
+else if(p==='close1'&&a==='next'){s.snapshot=JSON.parse(JSON.stringify({...s,snapshot:null}));s.day=2;s.phase='collect';const e=expiry(s);if(e.cost)post(s,'raw-expiry2',e.detail+' 过期报损 '+e.cost+' 元',{inventory:-e.cost,profit:-e.cost},'非现金',{kind:'spoilage'});}
+else if(p==='collect'&&a==='collect'){if(b.receivable)post(s,'collect','收回昨日欠款',{cash:b.receivable,receivable:-b.receivable});s.phase='prepare';}
+else if(p==='prepare'&&a==='stock'){if(s.flags.stock2)return false;const cart=n&&typeof n==='object'?n:suggestedCart(s,Math.min(5,possibleCups(s)+Math.floor(n||0))),q=quote(cart);if(!q||q.costFen<=0||q.costFen>cents(b.cash))return false;post(s,'stock2','采购原料与包材，共 '+q.cost+' 元',{cash:-q.cost,inventory:q.cost});receive(s,cart);s.flags.stock2=true;}
+else if(p==='prepare'&&a==='loan'&&!s.flags.loan){post(s,'loan','签约借款 · 第 3 天开门前还 14 元',{cash:12,debt:12},'筹资');s.flags.loan=true;}
+else if(p==='prepare'&&a==='machine'&&!s.flags.machine){if(b.cash<24)return false;post(s,'machine','购入摇茶机 · 产能提高到 5 杯',{cash:-24,equipment:24},'投资');s.flags.machine=true;}
+else if(p==='prepare'&&a==='ready'){s.phase='channel';}
+else if(p==='channel'&&['walk','group'].includes(a)){s.channel=a;s.phase=a==='group'?'confirm':'sell';}
+else if(p==='confirm'&&a==='confirm'){s.phase='sell';}
+else if(p==='confirm'&&a==='back'){s.phase='channel';}
+else if(p==='sell'&&a==='cup'){const cap=s.flags.machine?5:3;if(s.sold>=cap||possibleCups(s)<1)return false;if(!takeCup(s))return false;const price=s.channel==='group'?R.groupPrice:R.price;post(s,'cup'+s.sold,'第 '+(s.sold+1)+' 杯 · '+(s.channel==='group'?'团购欠条 +7 元':'散客付款 +5 元'),{inventory:-2,profit:price-2,...(s.channel==='group'?{receivable:price}:{cash:price})});s.sold++;}
+else if(p==='sell'&&a==='close'){if(s.flags.machine&&s.sold>0)post(s,'depreciation','摇茶机使用一天 · 折旧 4 元',{equipment:-4,profit:-4},'非现金');s.phase='close2';}
+else if(p==='close2'&&a==='next'){s.day=3;s.phase='due';const e=expiry(s);if(e.cost)post(s,'raw-expiry3',e.detail+' 过期报损 '+e.cost+' 元',{inventory:-e.cost,profit:-e.cost},'非现金',{kind:'spoilage'});if(s.flags.loan)post(s,'interest','贷款到期 · 确认利息 2 元',{interest:2,profit:-2},'非现金');}
+else if(p==='due'&&a==='repay'){if(s.flags.loan){if(b.cash<14){s.end='failure';s.phase='end';afterAction(s,a);return true;}post(s,'repay','归还本金 12 元、支付利息 2 元',{cash:-14,debt:-12,interest:-2},'还款');}s.end=s.flags.machine&&s.sold===5?'success':'continue';s.phase='end';}
+else return false;afterAction(s,a);if(['close1','close2','end'].includes(s.phase)){s.stockHistory||={};s.stockHistory[s.day]=JSON.parse(JSON.stringify({stockLots:s.stockLots,readyCups:s.readyCups}));}validate(s);validateStock(s);return true;}
+export function replay(s){if(!s.snapshot)return start();const v=JSON.parse(JSON.stringify(s.snapshot));v.snapshot=JSON.parse(JSON.stringify(s.snapshot));v.flags['review'+v.day]=true;act(v,'next');return v;}
+export function isSale(t){return t.kind==='sale'||(!t.kind&&(t.delta.inventory||0)<0);}
+export function report(s,day){const ts=s.tx.filter(t=>t.day===day), b=balances(s,day),opening=balances(s,day-1).cash;
+return {b,ts,opening,profit:sumMoney(ts.map(t=>t.delta.profit||0)),flow:sumMoney(ts.map(t=>t.delta.cash||0)),revenue:sumMoney(ts.filter(isSale).flatMap(t=>[-(t.delta.inventory||0),t.delta.profit||0])),cost:sumMoney(ts.filter(isSale).map(t=>-(t.delta.inventory||0))),spoilage:sumMoney(ts.filter(t=>t.kind==='spoilage').map(t=>-(t.delta.inventory||0)))};}

@@ -1,0 +1,38 @@
+import {gameLearningFixture} from './game-learning-test-helper.mjs';
+import {tradingTestClock} from './test-trading-clock.mjs';
+const tradingClock=tradingTestClock();
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {parseHTML} from 'linkedom';
+import {act,migrate,balances,SAVE_KEY,settlementSteps} from './dist/demo/engine.js';
+import {money} from './dist/demo/accounting.js';
+import {todayProfit} from './dist/demo/daily.js';
+import {prepared} from './trading-test-helpers.mjs';
+import {showTarget} from './screen-test-helpers.mjs';
+
+const mode=process.argv[2]||'hud',width=mode==='short'?320:390,height=mode==='short'?568:844,initial=mode==='six'?migrate(JSON.parse(readFileSync('fixtures/course-v27.json','utf8'))[3]):prepared();
+if(mode!=='hud')act(initial,'liquidate');
+const viewportListeners=new Map(),store=new Map([[SAVE_KEY,JSON.stringify(initial)]]),{window}=parseHTML(readFileSync('dist/index.html','utf8'));
+Object.assign(globalThis,{window,document:window.document,Event:window.Event,requestAnimationFrame:fn=>fn(),setTimeout:tradingClock.schedule,clearTimeout:tradingClock.cancel,localStorage:{getItem:key=>store.get(key)??null,setItem:(key,value)=>store.set(key,String(value)),removeItem:key=>store.delete(key)}});
+Object.defineProperty(window,'innerWidth',{value:width});Object.defineProperty(window,'innerHeight',{value:height});window.visualViewport={width,height,offsetTop:0,scale:1,addEventListener(type,fn){if(!viewportListeners.has(type))viewportListeners.set(type,[]);viewportListeners.get(type).push(fn);}};
+window.HTMLElement.prototype.showModal=function(){this.open=true;};window.HTMLElement.prototype.close=function(){this.open=false;};window.HTMLElement.prototype.focus=function(){document._focus=this;};window.HTMLElement.prototype.blur=function(){document._focus=null;};Object.defineProperty(document,'activeElement',{get:()=>document._focus||document.body});window.HTMLElement.prototype.scrollIntoView=function(){};
+const {startGame}=await import('./dist/demo/game.js');startGame(gameLearningFixture);
+const find=selector=>document.querySelector(selector),state=()=>JSON.parse(store.get(SAVE_KEY));
+function click(selector){if(selector.includes('skip-day')){assert.equal(document.querySelector('[data-action="skip-day"]'),null,'fast-forward is not exposed to players');tradingClock.finish(state);return;}const el=find(selector);assert.ok(el,`${state().stage}: ${selector}`);showTarget(el);assert.ok(!el.disabled);el.click();}
+function book(){if(!state().pendingBook)return;for(let guard=0;find('#discovery').open&&guard<8;guard++){click('[data-discovery-reveal]');click('[data-discovery-keep]');}const p=state().pendingBook,context=find('#book-caption').textContent,ids=p.id.split('|'),equipment=state().tx.find(t=>ids.includes(t.id)&&t.id==='liq-equipment');if(!p.automatic){assert.ok(find('#book-caption').classList.contains('transaction-context'));assert.equal(find('#book-caption').parentNode.id,'book');assert.ok(context);}if(equipment)assert.ok(context.includes(`设备账面 ${money(-equipment.delta.equipment)} 元，卖出收款 ${money(equipment.delta.cash)} 元`));for(const page of p.pages){click(`[data-bookpage="${page}"]`);if(!p.automatic)assert.equal(find('#book-caption').textContent,context);for(const input of [...document.querySelectorAll('[data-book-field]')]){showTarget(input);const [number,key]=input.dataset.bookField.split(':'),f=state().pendingBook.fields.find(f=>f.page===Number(number)&&f.key===key);input.value=String(f.target/100);input.dispatchEvent(new Event('input',{bubbles:true}));}}if(equipment&&p.fields.length&&!p.checked){const f=p.fields[0];click(`[data-bookpage="${f.page}"]`);const input=find(`#book-${f.page}-${f.key}`),caption=find('#book-caption'),facts=JSON.stringify(state().tx);showTarget(input);input.focus();window.visualViewport.height=340;for(const fn of viewportListeners.get('resize')||[])fn();assert.ok(document.body.classList.contains('keyboard-open'));assert.strictEqual(find('#book-caption'),caption);assert.equal(caption.hidden,false);assert.ok(caption.classList.contains('transaction-context'));assert.equal(caption.textContent,context);assert.ok(!input.closest('[hidden]'));assert.equal(JSON.stringify(state().tx),facts);input.blur();window.visualViewport.height=height;for(const fn of viewportListeners.get('resize')||[])fn();}if(p.fields.length&&!p.checked)click('[data-book-check]');for(const page of p.pages)click(`[data-bookpage="${page}"]`);click('[data-book-done]');}
+if(mode==='hud'){
+ const stats=[...document.querySelectorAll('#snapshot .stat')];assert.equal(stats.length,3);assert.equal(stats[0].dataset.openbook,'0');assert.ok(stats[1].hasAttribute('data-open-stock'));assert.equal(stats[1].hasAttribute('data-openbook'),false);assert.equal(stats[2].dataset.openbook,'1');assert.match(stats[2].textContent,/今日净利润/);assert.equal(Number(find('[data-day-profit]').textContent),todayProfit(state())/100);
+ const journal=JSON.stringify(state().tx);click('#snapshot [data-open-stock]');assert.equal(find('#reading').open,true);assert.equal(!!find('#book').open,false);for(const name of ['柠檬','茶叶','糖浆','塑料杯','吸管'])assert.ok(find('#reading-body').textContent.includes(name));assert.match(find('#reading-body').textContent,/没有成品茶库存/);click('#reading [data-close]');assert.equal(JSON.stringify(state().tx),journal);
+ click('#snapshot [data-openbook="1"]');assert.match(find('#book-tabs [aria-pressed="true"]').textContent,/利润表/);click('#book [data-close]');click('[data-action="daily-trade"]');click('[data-action="skip-day"]');assert.equal(Number(find('[data-day-profit]').textContent),todayProfit(state())/100);assert.ok(todayProfit(state())!==balances(state()).profit,'HUD shows this day, not the whole season');
+ console.log('HUD DOM: cash opens balance sheet; recipe quantity opens the raw-stock dialog; actual daily profit opens income statement and updates with sales.');
+}else{
+ let visited=[];for(let guard=0;state().stage!=='results'&&guard<20;guard++){
+  if(state().pendingBook){book();continue;}
+  const current=settlementSteps(state())[state().liquidation.step],step=state().liquidation.step,before=balances(state()),count=state().tx.length;visited.push(current.kind);
+  assert.equal(find('#card-title').dataset.settlementKind,current.kind);assert.equal(find('#card-title').textContent,current.title);assert.equal(find('#play .liquidation-list'),null,'future liquidation steps stay in optional overview');
+  const button=find('[data-action="settle"]');showTarget(button);assert.equal(button.textContent.trim(),current.action);assert.equal(Number(button.dataset.value),step);assert.equal(find('#card-title').textContent,current.title,'paging to the action keeps the current operation title');button.click();
+  if(current.kind==='inventory'&&!before.inventory)assert.equal(state().tx.length,count);if(current.kind==='equipment'){assert.equal(balances(state()).equipment,0);assert.equal(balances(state()).loan,before.loan);}if(current.kind==='loan')assert.equal(balances(state()).equipment,before.equipment);if(current.kind==='interest')assert.equal(balances(state()).profit,before.profit);
+ }
+ if(state().pendingBook)book();assert.equal(state().stage,'results');assert.deepEqual(visited,mode==='six'?['receivable','inventory','equipment','payable','loan','interest']:['inventory','equipment','loan']);assert.ok(find('.radar-score'));assert.equal(document.querySelectorAll('.radar-point').length,6);assert.match(find('#play').textContent,/应付账款尚欠.*应付利息尚欠/);
+ console.log(`Liquidation DOM ${width}×${height}: ${visited.length} steps, empty-stock skip, current heading/action/account consistency, full six-point radar and explicit remaining debt passed.`);
+}

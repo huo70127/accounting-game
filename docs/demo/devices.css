@@ -1,0 +1,163 @@
+/* One page for touch, tablet split view, desktop and embedded web browsers. */
+:root { --viewport-height: 100vh; --viewport-width: 100vw; --viewport-top: 0px; --dialog-gap: 16px; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; scroll-padding-bottom: 120px; }
+body { min-width: 0; }
+*,*::before,*::after { box-sizing: border-box; }
+button,a,input,label { -webkit-tap-highlight-color: rgba(53,107,209,.12); }
+button,a { touch-action: manipulation; }
+button { -webkit-appearance: none; appearance: none; }
+button:focus-visible { outline: 2px solid #356bd1; outline-offset: 3px; }
+.play-area,.dashboard,.card-content,.guide-speech,.book-input-cell { min-width: 0; }
+img,.card-content>svg,.mascot { max-width: 100%; }
+.card-title,.card-lead,.guide-speech,.book-row>span { overflow-wrap: anywhere; }
+.site-header { padding-left: max(24px,env(safe-area-inset-left,0px)); padding-right: max(24px,env(safe-area-inset-right,0px)); }
+.app-shell { width: min(1164px,calc(100% - 48px)); margin-left: auto; margin-right: auto; }
+.header-tools>.icon-button,.header-tools>.outline-button,.header-tools>.text-button { min-height: 44px; }
+.header-tools>.icon-button { min-width: 44px; }
+#openbook { position: relative; }
+#openbook .pending-badge { pointer-events: none; }
+.term-help:before { inset: -10px; }
+.book-input-cell .input-control { min-height: 44px; align-items: center; }
+.animated-statement .book-input-cell input { font-size: 16px; line-height: 1.5; -webkit-appearance: none; appearance: none; }
+.book-tabs button { min-height: 44px; }
+.book-row { min-width: 0; }
+.animated-statement.balance-statement .balance-sheet { min-width: 0; }
+.dialog-tools { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.dialog-tools .icon-button { min-width: 44px; min-height: 44px; }
+.keyboard-dismiss { min-height: 36px; padding: 5px 8px; border: 1px solid #c7d7ee; border-radius: 8px; color: #385f94; background: #edf4ff; font-size: 11px; }
+.keyboard-dismiss[hidden] { display: none; }
+
+/* Pixel viewport values also cover browsers without dvh or CSS :has(). */
+dialog:not([open]) { display: none; }
+body.has-open-dialog { overflow: hidden; }
+body.has-open-dialog .scene-action-dock { visibility: hidden; pointer-events: none; }
+dialog[open] { position: fixed; top: calc(var(--viewport-top) + var(--viewport-height)/2); left: 50%; right: auto; bottom: auto; margin: 0; transform: translate(-50%,-50%); max-width: calc(var(--viewport-width) - 24px); max-height: calc(var(--viewport-height) - var(--dialog-gap)*2); -webkit-overflow-scrolling: touch; }
+dialog#book[open] { inset: auto; top: calc(var(--viewport-top) + var(--viewport-height)/2); left: 50%; transform: translate(-50%,-50%); margin: 0; width: min(880px,calc(var(--viewport-width) - 32px)); height: min(880px,calc(var(--viewport-height) - var(--dialog-gap)*2)); max-height: calc(var(--viewport-height) - var(--dialog-gap)*2); }
+#book>#book-body { min-height: 44px; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+#book>#book-footer { padding-bottom: max(10px,env(safe-area-inset-bottom,0px)); }
+#discovery[open] { max-height: calc(var(--viewport-height) - 32px); }
+#discovery-body,#glossary,#challenge,.confirm-dialog,#soundsettings { -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+.dialog-shade { position: fixed; left: 0; top: var(--viewport-top); width: 100%; height: var(--viewport-height); background: rgba(35,52,75,.45); touch-action: none; }
+.dialog-shade[hidden] { display: none; }
+dialog.fallback-dialog[open] { display: block; }
+dialog#book.fallback-dialog[open],dialog#discovery.fallback-dialog[open] { display: flex; }
+dialog.fallback-dialog[open]:not(.top-dialog) { pointer-events: none; }
+
+/* iPad portrait and split view: give the story the full reading width. */
+@media(min-width:651px) and (max-width:980px) {
+ .game-layout { grid-template-columns: minmax(0,1fr); gap: 20px; }
+ .dashboard { position: static; grid-template-columns: minmax(280px,1.2fr) minmax(250px,1fr); gap: 16px; }
+ .guide-card { display: flex; align-items: center; padding: 12px; min-height: 122px; text-align: left; }
+ .guide-card>.approved-companions { flex: 0 0 130px; width: 130px; height: 100px; margin: 0 10px 0 0; }
+ .duo-labels { display: none; }
+ .guide-speech { flex: 1; padding: 12px; font-size: 12px; line-height: 1.8; }
+ .pocket-card { padding: 12px; }
+ .pocket-card>.section-label { margin-bottom: 9px; }
+ .snapshot { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 7px; }
+ .stat,.stat:first-child { display: block; min-height: 84px; padding: 10px 7px; grid-column: auto; }
+ .stat-label { font-size: 10px; line-height: 1.5; flex-wrap: wrap; }
+ .stat strong,.stat:first-child strong { font-size: 25px; margin-top: 8px; }
+ .calendar-card { display: none; }
+ .save-status { grid-column: 1/-1; margin: 0; }
+ .play-card { min-height: 0; }
+ .card-content { padding: 30px; }
+ .actionbar small { max-width: none; }
+}
+@media(min-width:700px) {
+ .card-lead { font-size: 15px; }
+ .answer-option { font-size: 15px; min-height: 64px; }
+ .animated-statement .book-row { font-size: 14px; line-height: 1.7; }
+ .animated-statement .balance-sheet .book-row { font-size: 13px; }
+ .statement-columns,.cashflow-group>h4 { font-size: 13px; }
+ .balance-column>h4 { font-size: 15px; }
+}
+@media(min-width:981px) and (max-width:1200px) {
+ .game-layout { grid-template-columns: 246px minmax(0,1fr); gap: 22px; }
+}
+
+@media(max-width:650px) {
+ :root { --dialog-gap: 8px; }
+ .app-shell { width: calc(100% - 28px); margin-left: auto; margin-right: auto; }
+ .site-header { padding: 12px 14px; gap: 8px; }
+ .header-tools { gap: 0; flex-shrink: 0; }
+ .header-tools>.icon-button { width: 44px; min-width: 44px; }
+ .header-tools>.outline-button { width: 44px; min-width: 44px; padding: 0; font-size: 0; }
+ .header-tools>.text-button { min-width: 44px; padding: 0 4px; font-size: 11px; }
+ #openbook .pending-badge { position: absolute; top: -3px; right: -3px; padding: 0 3px; font-size: 9px; line-height: 16px; margin: 0; }
+ .brand { gap: 8px; font-size: 19px; letter-spacing: 1px; }
+ .brand-mark { width: 34px; height: 34px; font-size: 30px; }
+ .brand small { display: none; }
+ .guide-speech { font-size: 12px; line-height: 1.8; }
+ .save-status { display: block; margin: 0; font-size: 10px; line-height: 1.6; }
+ .site-footer { line-height: 1.8; flex-wrap: wrap; font-size: 10px; }
+ .site-footer button,.site-footer a { min-height: 36px; display: inline-flex; align-items: center; }
+ dialog#book[open] { width: calc(var(--viewport-width) - 16px); padding: 12px 12px 0; border-radius: 18px; }
+ #book>.dialog-heading { min-height: 48px; }
+ #book>#book-caption { min-height: 34px; font-size: 11px; }
+ #book>#book-tabs { min-height: 56px; margin: 7px 0 10px; }
+ .book-tabs button { font-size: 12px; }
+ #book .balance-statement { padding: 12px 8px; }
+ .animated-statement .balance-sheet .book-row { gap: 4px; }
+ .balance-sheet .book-input-cell { max-width: 72px; }
+ .animated-statement .balance-sheet .book-input-cell input { min-width: 44px; max-width: 66px; width: 4.5ch; }
+ .financial-table .book-row .input-control>span { display: none; }
+}
+@media(max-width:359px) {
+ .site-header { padding-left: 10px; padding-right: 10px; gap: 4px; }
+ .brand { font-size: 18px; gap: 6px; }
+ .brand-mark { width: 31px; height: 31px; }
+ .chapter-heading { flex-wrap: wrap; gap: 8px; }
+ .chapter-heading h1>span { display: inline; }
+ .card-content { padding: 20px 16px; }
+ .guide-card>.approved-companions { width: 112px; flex-shrink: 0; margin-right: 8px; }
+ .stat,.stat:first-child { padding: 9px 7px; }
+ .stat-label { font-size: 9px; }
+ .stat strong,.stat:first-child strong { font-size: 22px; }
+ .book-tabs button { font-size: 11px; }
+}
+
+/* Visible viewport, not hardware screen height, determines keyboard/short layouts. */
+body.keyboard-open,body.viewport-short { --dialog-gap: 6px; }
+.viewport-short dialog#book[open],.keyboard-open dialog#book[open] { padding: 6px 10px 0; }
+.viewport-short #book>.dialog-heading,.keyboard-open #book>.dialog-heading { min-height: 36px; height: 36px; }
+.viewport-short #book .dialog-heading .eyebrow,.keyboard-open #book .dialog-heading .eyebrow { display: none; }
+.viewport-short #book .dialog-heading h2,.keyboard-open #book .dialog-heading h2 { font-size: 18px; margin: 0; }
+.viewport-short #book>#book-caption,.keyboard-open #book>#book-caption { display: none; }
+.viewport-short #book>#book-tabs,.keyboard-open #book>#book-tabs { min-height: 44px; height: 44px; margin: 4px 0; gap: 5px; }
+.viewport-short #book-tabs button,.keyboard-open #book-tabs button { min-height: 44px; font-size: 11px; padding: 3px; }
+.viewport-short #book-tabs small,.keyboard-open #book-tabs small { display: none; }
+.viewport-short #book-tabs .pending-badge,.keyboard-open #book-tabs .pending-badge { display: inline-block; font-size: 9px; line-height: 1.2; margin-top: 2px; padding: 1px 3px; }
+.viewport-short #book>#book-footer,.keyboard-open #book>#book-footer { grid-template-rows: 30px 44px; flex: 0 0 88px; height: 88px; min-height: 88px; padding: 4px 0 8px; gap: 2px; }
+.viewport-short #book-footer .primary-button,.keyboard-open #book-footer .primary-button { height: 44px; min-height: 44px; }
+.viewport-short #book .book-secondary-actions,.keyboard-open #book .book-secondary-actions { display: none; }
+.viewport-short #book-footer .book-nudge,.viewport-short #book-footer .book-success,.viewport-short #book-footer .entry-alert,.keyboard-open #book-footer .book-nudge,.keyboard-open #book-footer .book-success,.keyboard-open #book-footer .entry-alert { padding: 3px 8px; font-size: 11px; line-height: 1.6; }
+.viewport-very-short #book>.dialog-heading { height: 30px; min-height: 30px; }
+.viewport-very-short #book .dialog-heading h2 { font-size: 16px; }
+.viewport-very-short #book>#book-footer { grid-template-rows: 24px 44px; flex-basis: 78px; height: 78px; min-height: 78px; }
+.viewport-very-short #book>.dialog-heading .icon-button { min-height: 30px; height: 30px; }
+.viewport-very-short #book>#book-body { min-height: 36px; }
+@media(orientation:landscape) and (max-height:600px) and (max-width:1100px) {
+ body.has-scene-actions { padding-bottom: calc(82px + env(safe-area-inset-bottom,0px)); }
+ .scene-action-dock .actionbar { grid-template-columns: minmax(0,1fr) 240px; grid-template-rows: 52px; width: calc(100% - 32px); height: 76px; padding: 8px 0 12px; gap: 16px; }
+ .scene-action-dock .actionbar>.primary-button { width: 240px; height: 52px; }
+ .scene-action-dock .actionbar>small { max-height: 48px; text-align: left; }
+ .day-timeline { padding: 10px 14px; }
+ .day-track { margin-top: 12px; }
+}
+body.viewport-very-short { --dialog-gap: 0px; }
+.viewport-very-short #book>#book-tabs { margin: 0; }
+.viewport-very-short #book>#book-footer { grid-template-rows: 22px 44px; flex-basis: 72px; height: 72px; min-height: 72px; padding: 2px 0 2px; gap: 2px; }
+/* Landscape notches and home indicators keep their own space. */
+:root { --viewport-safe-top: env(safe-area-inset-top,0px); --viewport-safe-bottom: env(safe-area-inset-bottom,0px); }
+body { --usable-height: calc(var(--viewport-height) - var(--viewport-safe-top) - var(--viewport-safe-bottom)); }
+body.keyboard-open { --viewport-safe-bottom: 0px; }
+.app-shell { padding-left: env(safe-area-inset-left,0px); padding-right: env(safe-area-inset-right,0px); }
+.scene-action-dock { padding-left: env(safe-area-inset-left,0px); padding-right: env(safe-area-inset-right,0px); }
+dialog[open] { top: calc(var(--viewport-top) + var(--viewport-safe-top) + var(--usable-height)/2); max-width: calc(var(--viewport-width) - 24px - env(safe-area-inset-left,0px) - env(safe-area-inset-right,0px)); max-height: calc(var(--usable-height) - var(--dialog-gap)*2); }
+dialog#book[open] { top: calc(var(--viewport-top) + var(--viewport-safe-top) + var(--usable-height)/2); width: min(880px,calc(var(--viewport-width) - 32px - env(safe-area-inset-left,0px) - env(safe-area-inset-right,0px))); height: min(880px,calc(var(--usable-height) - var(--dialog-gap)*2)); max-height: calc(var(--usable-height) - var(--dialog-gap)*2); }
+#discovery[open] { max-height: calc(var(--usable-height) - var(--dialog-gap)*2); }
+.viewport-very-short .keyboard-dismiss { height: 30px; min-height: 30px; padding: 2px 6px; }
+@media(max-width:650px) { dialog#book[open] { width: calc(var(--viewport-width) - 16px - env(safe-area-inset-left,0px) - env(safe-area-inset-right,0px)); } }
+
+@media(min-width:651px) and (max-width:719px) { .dashboard { grid-template-columns: minmax(0,1fr); } .pocket-card .snapshot { grid-template-columns: repeat(3,minmax(0,1fr)); } }
+@media(min-width:700px) { .day-track li { font-size: 11px; } .statement-meta,.statement-note { font-size: 12px; } }

@@ -1,0 +1,17 @@
+柠檬摊 · 独立手写数字试验
+
+识别在浏览器本地运行。笔迹不上传，不读取正式游戏存档，也不读取任何题目的正确答案。
+
+数字模型：使用 scikit-learn 在 MNIST 的 60,000 个训练样本上训练的 784 → 96 → 10 小型网络；浏览器直接运行推理，无第三方运行时或云端识别服务。digits.f32 为本试验生成的权重。
+
+MNIST 数据版权：Yann LeCun、Corinna Cortes；原始数据整理亦归功于 Christopher J. C. Burges。数据由 TensorFlow/Keras 官方镜像提供，按 Creative Commons Attribution-ShareAlike 3.0 授权。为明确保留来源，本试验的模型权重也以 CC BY-SA 3.0 提供。
+https://creativecommons.org/licenses/by-sa/3.0/
+https://www.tensorflow.org/api_docs/python/tf/keras/datasets/mnist/load_data
+
+模型信息与尺寸：handwriting/model.json
+训练代码：项目源码 design/train-handwriting.py
+未把 MNIST 训练原图放进网站。模型的留出数据集成绩只用于检查数字分类器，不能代表手指实写、多位数分割、小数点或不同设备上的准确度。
+
+试验限制：从左到右书写，数字之间稍留空隙；暂不支持叠写、连写数字及复杂符号。识别结果先展示，可点候选修改；也可以撤销一笔、重写、删除末位或使用页面内数字按钮修改。
+
+角色图沿用正式 Demo 已批准的圆滚滚与贼溜溜素材；原音效与素材出处见项目 ASSET_CREDITS.md。

@@ -1,0 +1,2 @@
+import assert from 'node:assert/strict';
+export function tradingTestClock(){let id=0;const jobs=new Map();return {schedule(fn,ms){jobs.set(++id,{fn,ms});return id;},cancel(key){jobs.delete(key);},finish(state){for(let guard=0;state().stage==='dailyTrading'&&guard<100;guard++){const entry=[...jobs.entries()].find(([,job])=>job.ms===100);assert.ok(entry,'live trading schedules its next frame');jobs.delete(entry[0]);entry[1].fn();}assert.equal(state().stage,'dailySold');}};}
