@@ -14,11 +14,11 @@
 
 源码仓库：https://github.com/huo70127/accounting-game
 
-GitHub Pages 配置为从 `main` 分支的 `/docs` 目录发布。`dist/` 是可直接运行的游戏，`docs/` 由它生成；页面与素材使用相对路径，支持 GitHub 项目子目录。
+已准备好供 GitHub Pages 从 `main` 分支的 `/docs` 目录发布的静态文件。`dist/` 是可直接运行的游戏，`docs/` 由它生成；页面与素材使用相对路径，支持 GitHub 项目子目录。
 
 更新游戏后运行 `npm run build:pages`，将源码与 `docs/` 一并提交到 `main` 即可更新网页。`.nojekyll` 保留原有静态文件结构。无需后端或登录；玩家进度保存在当前浏览器，不随网址迁移。
 
-首次启用：仓库 **Settings → Pages → Deploy from a branch → main → /docs → Save**。若已通过 API 启用，无需重复设置。
+首次启用：仓库 **Settings → Pages → Deploy from a branch → main → /docs → Save**。代码上传已完成；启用 Pages 需要仓库管理员在此页面保存设置。启用后，GitHub 会显示正式访问地址。
 
 ## 启动与检查
 
